@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Rekognition Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { margin-top: 0; }
+        .container { display: flex; gap: 20px; }
+        .column { flex: 1; border: 1px solid #ccc; padding: 20px; border-radius: 8px; box-shadow: 0 0 5px #aaa; }
+        .column img { max-width: 100%; max-height: 200px; display: block; margin-bottom: 10px; }
+        button { display: block; margin: 10px 0; padding: 10px 15px; font-size: 14px; cursor: pointer; }
+        input[type="file"] { margin-bottom: 10px; }
+        pre { background: #f7f7f7; padding: 10px; border-radius: 5px; max-height: 400px; overflow: auto; }
+    </style>
+</head>
+<body>
+
+<h1>AWS Rekognition Demo</h1>
+<div class="container">
+
+    <!-- Cột 1: Chọn ảnh & preview -->
+    <div class="column">
+        <h2>Chọn ảnh</h2>
+        <input type="file" id="image" accept="image/*">
+        <img id="preview" src="" alt="Preview ảnh">
+    </div>
+
+    <!-- Cột 2: Các API buttons -->
+    <div class="column">
+        <h2>Gọi API</h2>
+        <button id="detect-labels">Detect Labels</button>
+        <button id="recognise">Recognise Faces</button>
+        <button id="compare-faces">Compare Faces</button>
+        <h3>Kết quả</h3>
+        <pre id="api-result">Chưa có kết quả</pre>
+    </div>
+
+    <!-- Cột 3: Upload & Collection -->
+    <div class="column">
+        <h2>Upload & Collection</h2>
+        <input type="file" id="image_upload" accept="image/*">
+        <img id="upload-preview" src="" alt="Preview upload">
+        <input type="text" id="name" placeholder="Nhập tên">
+        <input type="number" id="age" placeholder="Nhập tuổi">
+        <button id="upload-s3">Upload lên S3</button>
+        <h3>Kết quả</h3>
+        <pre id="upload-result">Chưa có kết quả</pre>
+    </div>
+
+</div>
+
+<script>
+    // ==== Cột 1 ==== 
+    let selectedFile = null;
+    document.getElementById("image").addEventListener("change", (e) => {
+        selectedFile = e.target.files[0];
+        if (selectedFile) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                document.getElementById("preview").src = evt.target.result;
+            }
+            reader.readAsDataURL(selectedFile);
+        }
+    });
+
+    async function sendFile(endpoint) {
+        if (!selectedFile) { alert("Hãy chọn ảnh trước!"); return; }
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        const response = await fetch(endpoint, { method: "POST", body: formData });
+        return await response.json();
+    }
+
+    document.getElementById("detect-labels").addEventListener("click", async () => {
+        const result = await sendFile("/detect");
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+
+    document.getElementById("recognise").addEventListener("click", async () => {
+        const result = await sendFile("/recognise");
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+
+    document.getElementById("compare-faces").addEventListener("click", async () => {
+        const result = await sendFile("/compare-faces");
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+
+    // ==== Cột 3 ==== 
+    let selectedUploadFile = null;
+    document.getElementById("image_upload").addEventListener("change", (e) => {
+        selectedUploadFile = e.target.files[0];
+        if (selectedUploadFile) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                document.getElementById("upload-preview").src = evt.target.result;
+            }
+            reader.readAsDataURL(selectedUploadFile);
+        }
+    });
+
+    async function sendUploadFile(endpoint) {
+        if (!selectedUploadFile) {
+            alert("Hãy chọn ảnh trước!");
+            return;
+        }
+        const name = document.getElementById("name").value.trim();
+        const age = document.getElementById("age").value.trim();
+
+        const formData = new FormData();
+        formData.append("image_upload", selectedUploadFile);
+        formData.append("name", name);
+        formData.append("age", age);
+
+        const response = await fetch(endpoint, { method: "POST", body: formData });
+        return await response.json();
+    }
+
+    document.getElementById("upload-s3").addEventListener("click", async () => {
+        const result = await sendUploadFile("/upload");
+        document.getElementById("upload-result").textContent = JSON.stringify(result, null, 2);
+    });
+</script>
+
+</body>
+</html>
