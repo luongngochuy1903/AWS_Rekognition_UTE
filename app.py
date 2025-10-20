@@ -5,6 +5,10 @@ from dotenv import load_dotenv
 from modules.detect_label import detect_labels
 from modules.upload_s3 import upload_to_s3
 from modules.face_regconise import faceRegconise
+from modules.search_face import search_faces
+from modules.search_user import search_users
+from modules.search_user_by_image import search_users_by_image
+from modules.compare_image import compare_faces
 
 load_dotenv("aws-credentials.env")
 
@@ -35,9 +39,25 @@ def index():
 def detect():
     return detect_labels(rekognition)
 
+@app.route('/compare', methods=['POST'])
+def compare():
+    return compare_faces(rekognition)
+
 @app.route('/upload', methods=['POST'])
 def upload():
     return upload_to_s3(rekognition, s3)
+
+@app.route('/search_face', methods=['POST'])
+def search_face():
+    return search_faces(rekognition)
+
+@app.route('/search_users', methods=['POST'])
+def search_user():
+    return search_users(rekognition)
+
+@app.route('/search_users_by_image', methods=['POST'])
+def search_users_by_images():
+    return search_users_by_image(rekognition)
 
 #Nhóm 1
 @app.route('/recognise', methods=['POST'])

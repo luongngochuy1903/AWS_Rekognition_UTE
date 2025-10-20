@@ -24,6 +24,11 @@
         <h2>Chọn ảnh</h2>
         <input type="file" id="image" accept="image/*">
         <img id="preview" src="" alt="Preview ảnh">
+        <input type="file" id="image_target" accept="image/*">
+        <img id="preview_target" src="" alt="Preview ảnh đích">
+        <input type="text" id="face_id" placeholder="Nhập face ID:">
+        
+        
     </div>
 
     <!-- Cột 2: Các API buttons -->
@@ -32,6 +37,9 @@
         <button id="detect-labels">Detect Labels</button>
         <button id="recognise">Recognise Faces</button>
         <button id="compare-faces">Compare Faces</button>
+        <button id="search-face">Search Face</button>
+        <button id="search-user">Search User</button>
+        <button id="search-user-by-image">Search user by image</button>
         <h3>Kết quả</h3>
         <pre id="api-result">Chưa có kết quả</pre>
     </div>
@@ -51,43 +59,108 @@
 </div>
 
 <script>
-    // ==== Cột 1 ==== 
+    // ==== Cột 1 ====
     let selectedFile = null;
+    let targetFile = null;
     document.getElementById("image").addEventListener("change", (e) => {
         selectedFile = e.target.files[0];
         if (selectedFile) {
             const reader = new FileReader();
             reader.onload = (evt) => {
                 document.getElementById("preview").src = evt.target.result;
-            }
+            };
             reader.readAsDataURL(selectedFile);
         }
     });
 
-    async function sendFile(endpoint) {
-        if (!selectedFile) { alert("Hãy chọn ảnh trước!"); return; }
+    document.getElementById("image_target").addEventListener("change", (e) => {
+        targetFile = e.target.files[0];
+        if (targetFile) {
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                document.getElementById("preview_target").src = evt.target.result;
+            };
+            reader.readAsDataURL(targetFile);
+        }
+    });
+
+    async function sendFile(endpoint, extraData = {}) {
+        if (!selectedFile) { 
+            alert("Hãy chọn ảnh trước!"); 
+            return; 
+        }
         const formData = new FormData();
         formData.append("image", selectedFile);
+        for (const [k, v] of Object.entries(extraData)) formData.append(k, v);
+
         const response = await fetch(endpoint, { method: "POST", body: formData });
         return await response.json();
     }
 
+    // ====== Các nút API ======
     document.getElementById("detect-labels").addEventListener("click", async () => {
         const result = await sendFile("/detect");
         document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
     });
 
     document.getElementById("recognise").addEventListener("click", async () => {
-        const result = await sendFile("/recognise");
+        const result = await sendFile("/recognise"); // SearchFacesByImage
         document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
     });
 
     document.getElementById("compare-faces").addEventListener("click", async () => {
-        const result = await sendFile("/compare-faces");
+        if (!selectedFile ) {
+            alert("Vui lòng chọn ảnh nguồn so sánh!");
+            return;
+        }
+        if (!targetFile) {
+            alert("Vui lòng chọn ảnh đích để so sánh!");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("image", selectedFile);
+        formData.append("image_target", targetFile);
+
+        const res = await fetch("/compare", { method: "POST", body: formData });
+        const result = await res.json();
+
         document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
     });
 
-    // ==== Cột 3 ==== 
+    // ====== SearchFaces (theo FaceId) ======
+    document.getElementById("search-face").addEventListener("click", async () => {
+        const faceId = document.getElementById("face_id").value.trim();
+        if (!faceId) { alert("Hãy nhập FaceId trước!"); return; }
+
+        const formData = new FormData();
+        formData.append("face_id", faceId);
+
+        const res = await fetch("/search_face", { method: "POST", body: formData });
+        const result = await res.json();
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+
+    // ====== SearchUsers (theo FaceId) ======
+    document.getElementById("search-user").addEventListener("click", async () => {
+        const faceId = document.getElementById("face_id").value.trim();
+        if (!faceId) { alert("Hãy nhập FaceId trước!"); return; }
+
+        const formData = new FormData();
+        formData.append("face_id", faceId);
+
+        const res = await fetch("/search_users", { method: "POST", body: formData });
+        const result = await res.json();
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+
+    // ====== SearchUsersByImage (ảnh mới) ======
+    document.getElementById("search-user-by-image").addEventListener("click", async () => {
+        const result = await sendFile("/search_users_by_image");
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+
+    // ==== Cột 3 ====
     let selectedUploadFile = null;
     document.getElementById("image_upload").addEventListener("change", (e) => {
         selectedUploadFile = e.target.files[0];
@@ -95,7 +168,7 @@
             const reader = new FileReader();
             reader.onload = (evt) => {
                 document.getElementById("upload-preview").src = evt.target.result;
-            }
+            };
             reader.readAsDataURL(selectedUploadFile);
         }
     });

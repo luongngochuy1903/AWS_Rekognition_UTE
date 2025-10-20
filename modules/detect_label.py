@@ -12,7 +12,6 @@ def detect_labels(rekognition):
 
         response = rekognition.detect_labels(
             Image={'Bytes': image_bytes},
-            MaxLabels=10,
             MinConfidence=70
         )
 

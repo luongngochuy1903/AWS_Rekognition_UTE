@@ -16,7 +16,9 @@ def faceRegconise(rekognition):
         for match in response.get('FaceMatches', []):
             matches.append({
                 "ExternalImageId": match['Face']['ExternalImageId'],
-                "Similarity": match['Similarity']
+                "Similarity": match['Similarity'],
+                "FaceID": match['Face']['FaceId'],
+                "SearchedFaceConfidence":match['SearchedFaceConfidence']
             })
 
         return jsonify({
