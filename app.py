@@ -6,6 +6,12 @@ from modules.detect_label import detect_labels
 from modules.upload_s3 import upload_to_s3
 from modules.face_regconise import faceRegconise
 
+from modules.detect_faces import detect_faces
+from modules.detect_text import detect_text
+from modules.detect_moderation_labels import detect_moderation_labels
+from modules.recognize_celebrities import recognize_celebrities
+
+
 load_dotenv("aws-credentials.env")
 
 AWS_REGION = os.getenv("AWS_REGION")
@@ -39,9 +45,30 @@ def detect():
 def upload():
     return upload_to_s3(rekognition, s3)
 
+#t
+@app.route('/detect-text', methods=['POST'])
+def detectText():
+    return detect_text(rekognition)
+
+@app.route('/detect-moderation-labels', methods=['POST'])
+def detectModerationLabels():
+    return detect_moderation_labels(rekognition)
+
+
+
 #Nhóm 1
 @app.route('/recognise', methods=['POST'])
 def recognise():
     return faceRegconise(rekognition)
+#tâm
+@app.route('/detect-faces', methods=['POST'])
+def detectFaces():
+    return detect_faces(rekognition)
+
+@app.route('/recognize-celebrities', methods=['POST'])
+def recognizeCelebrities():
+    return recognize_celebrities(rekognition)
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8087, debug=True)
