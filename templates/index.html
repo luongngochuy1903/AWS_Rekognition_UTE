@@ -4,15 +4,89 @@
     <meta charset="UTF-8">
     <title>AWS Rekognition Demo</title>
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h2 { margin-top: 0; }
-        .container { display: flex; gap: 20px; flex-wrap: wrap; }
-        .column { flex: 1; border: 1px solid #ccc; padding: 20px; border-radius: 8px; box-shadow: 0 0 5px #aaa; min-width: 300px; }
-        .column img { max-width: 100%; max-height: 200px; display: block; margin-bottom: 10px; }
-        button { display: block; margin: 10px 0; padding: 10px 15px; font-size: 14px; cursor: pointer; }
-        input[type="file"] { margin-bottom: 10px; }
-        pre { background: #f7f7f7; padding: 10px; border-radius: 5px; max-height: 400px; overflow: auto; }
-    </style>
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 20px;
+        line-height: 1.5;
+        background-color: #f0f2f5; /* nền tổng thể nhạt */
+        color: #2c3e50;
+    }
+
+    h2 {
+        margin-top: 0;
+        font-size: 22px;
+        color: #34495e; /* tiêu đề chuyên nghiệp */
+    }
+
+    .container {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .column {
+        flex: 1;
+        border-radius: 10px;
+        padding: 20px;
+        min-width: 280px;
+        background-color: #ffffff; /* nền trắng cơ bản */
+        border-left: 5px solid #3498db;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+        transition: transform 0.2s, box-shadow 0.2s, background-color 0.3s;
+    }
+
+    /* thêm màu nền nhạt cho column hover */
+    .column:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+        background-color: #f1f8ff; /* xanh nhạt khi hover */
+    }
+
+    /* các loại column khác nhau có thể thêm class riêng */
+    .column.face { background-color: #fcfbf7; }       /* vàng nhạt */
+    .column.text { background-color: #f0fcf7; }       /* xanh lá nhạt */
+    .column.celebrity { background-color: #f7f0fc; }  /* tím nhạt */
+
+    .column img {
+        max-width: 100%;
+        max-height: 200px;
+        display: block;
+        margin-bottom: 12px;
+        border-radius: 6px;
+        object-fit: cover;
+    }
+
+    button {
+        margin: 8px 0;
+        padding: 10px 16px;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 6px;
+        border: none;
+        background-color: #2980b9;
+        color: #fff;
+        transition: background 0.3s;
+    }
+
+    button:hover {
+        background-color: #1c5980;
+    }
+
+    input[type="file"] {
+        margin-bottom: 12px;
+    }
+
+    pre {
+        background: #ecf0f1;
+        padding: 12px;
+        border-radius: 6px;
+        max-height: 350px;
+        overflow: auto;
+        font-size: 13px;
+        color: #2c3e50;
+    }
+</style>
+
 </head>
 <body>
 
@@ -46,6 +120,7 @@
         <button id="recognize-celebrities">Recognize Celebrities</button> <!-- nhóm 1 -->
         <button id="detect-text">Detect Text</button> <!-- nhóm 2 -->
         <button id="detect-moderation-labels">Detect Moderation Labels</button> <!-- nhóm 2 -->
+        <button id="detect-protective-equipment">Detect Protective Equipment</button> <!-- nhóm 2 -->
         <!-- 👆 Tâm thêm xong -->
 
         <h3>Kết quả</h3>
@@ -186,6 +261,10 @@
 
     document.getElementById("detect-moderation-labels").addEventListener("click", async () => {
         const result = await sendFile("/detect-moderation-labels");
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+    document.getElementById("detect-protective-equipment").addEventListener("click", async () => {
+        const result = await sendFile("/detect-protective-equipment");
         document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
     });
     // 👆 Kết thúc phần Tâm thêm

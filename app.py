@@ -12,6 +12,8 @@ from modules.compare_image import compare_faces
 
 from modules.video.label_detect_vid import *
 from modules.video.face_detect_vid import *
+from modules.video.text_detect_vid import *
+from modules.video.celebrity_Recognition_vid import *
 
 from modules.detect_faces import detect_faces
 from modules.detect_text import detect_text
@@ -64,6 +66,9 @@ def detectFaces():
 @app.route('/recognize-celebrities', methods=['POST'])
 def recognizeCelebrities():
     return recognize_celebrities(rekognition)
+@app.route('/detect-protective-equipment', methods=['POST'])
+def detect_protective_equipment():
+    return detect_protective_equipment(rekognition)
 
 #VIDEO
 @app.route('/video')
@@ -82,6 +87,13 @@ def video_label_detect():
 def video_face_detect():
     return detect_faces_video(rekognition)
 
+@app.route('/video/text-detect', methods=['POST'])
+def video_text_detect():
+    return detect_text_video(rekognition)
+
+@app.route('/video/celebrity-recognition', methods=['POST'])
+def video_celebrity_recognition():
+    return detect_celebrity_video(rekognition)
 #Nhóm 1
 @app.route('/recognise', methods=['POST'])
 def recognise():
