@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>AWS Rekognition Video Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h2 { margin-top: 0; }
+        .container { display: flex; gap: 20px; }
+        .column { flex: 1; border: 1px solid #ccc; padding: 20px; border-radius: 8px; box-shadow: 0 0 5px #aaa; }
+        button { display: block; margin: 10px 0; padding: 10px 15px; font-size: 14px; cursor: pointer; }
+        input[type="file"] { display: block; margin: 10px 0; width: 100%; }
+        pre { background: #f7f7f7; padding: 10px; border-radius: 5px; max-height: 500px; overflow: auto; }
+    </style>
+</head>
+<body>
+
+<h1>AWS Rekognition Video Demo</h1>
+
+<div class="container">
+
+    <!-- Cột 1: Upload video -->
+    <div class="column">
+        <h2>Upload Video to S3</h2>
+        <input type="file" id="video_file" accept="video/*">
+        <button id="upload_video">Upload Video</button>
+        <h3>Upload Result</h3>
+        <pre id="upload_result">Chưa có kết quả</pre>
+    </div>
+
+    <!-- Cột 2: API Buttons -->
+    <div class="column">
+        <h2>API Calls</h2>
+        <button id="detect_labels">Detect Labels</button>
+        <button id="detect_faces">Detect Faces</button>
+    </div>
+
+    <!-- Cột 3: JSON Result -->
+    <div class="column">
+        <h2>API Result</h2>
+        <pre id="api_result">Chưa có kết quả</pre>
+    </div>
+
+</div>
+
+<script>
+let uploadedFileKey = "";
+
+// Upload video
+document.getElementById("upload_video").addEventListener("click", async () => {
+    const fileInput = document.getElementById("video_file");
+    if (!fileInput.files[0]) { alert("Hãy chọn video!"); return; }
+
+    const formData = new FormData();
+    formData.append("video", fileInput.files[0]);
+
+    const res = await fetch("/video/upload", { method: "POST", body: formData });
+    const result = await res.json();
+
+    uploadedFileKey = result.file_name || "";
+    document.getElementById("upload_result").textContent = JSON.stringify(result, null, 2);
+});
+
+// Hàm gọi API chung
+async function callApi(endpoint) {
+    if (!uploadedFileKey) { alert("Chưa upload video!"); return; }
+
+    const formData = new FormData();
+    formData.append("s3_file", uploadedFileKey);
+
+    const res = await fetch(endpoint, { method: "POST", body: formData });
+    const result = await res.json();
+
+    document.getElementById("api_result").textContent = JSON.stringify(result, null, 2);
+}
+
+// Buttons API
+document.getElementById("detect_labels").addEventListener("click", () => callApi("/video/label-detect"));
+document.getElementById("detect_faces").addEventListener("click", () => callApi("/video/face-detect"));
+
+</script>
+
+</body>
+</html>

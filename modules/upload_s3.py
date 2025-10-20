@@ -30,3 +30,18 @@ def upload_to_s3(rekognition, s3):
 
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 500
+
+def upload_s3_video(s3):
+    try:
+        S3_PREFIX = "video/"
+        file = request.files['video']
+        unique_filename = file.filename
+        s3_key = f"{S3_PREFIX}{unique_filename}" 
+        s3.upload_fileobj(file, 'rekognition-hcmutevn', s3_key)
+        return jsonify(
+            {"status": "success",
+            "file_name": s3_key
+            }
+            )
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
