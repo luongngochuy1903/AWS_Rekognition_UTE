@@ -14,7 +14,6 @@ def search_faces(rekognition):
             {
                 "FaceID": res['Face']['FaceId'],
                 'ExternalImageId': res['Face'].get('ExternalImageId'),
-                "UserID": res['UserId'],
                 "Similarity": res['Similarity']
             }
             for res in response.get('FaceMatches', [])

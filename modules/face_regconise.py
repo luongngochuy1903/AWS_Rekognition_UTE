@@ -17,13 +17,13 @@ def faceRegconise(rekognition):
             matches.append({
                 "ExternalImageId": match['Face']['ExternalImageId'],
                 "Similarity": match['Similarity'],
-                "FaceID": match['Face']['FaceId'],
-                "SearchedFaceConfidence":match['SearchedFaceConfidence']
+                "FaceID": match['Face']['FaceId']     
             })
 
         return jsonify({
             "status": "success",
-            "matches": matches
+            "matches": matches,
+            "SearchedFaceConfidence": response.get('SearchedFaceConfidence', {})
         })
     except Exception as e:
         return jsonify({

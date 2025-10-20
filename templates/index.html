@@ -6,8 +6,8 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; }
         h2 { margin-top: 0; }
-        .container { display: flex; gap: 20px; }
-        .column { flex: 1; border: 1px solid #ccc; padding: 20px; border-radius: 8px; box-shadow: 0 0 5px #aaa; }
+        .container { display: flex; gap: 20px; flex-wrap: wrap; }
+        .column { flex: 1; border: 1px solid #ccc; padding: 20px; border-radius: 8px; box-shadow: 0 0 5px #aaa; min-width: 300px; }
         .column img { max-width: 100%; max-height: 200px; display: block; margin-bottom: 10px; }
         button { display: block; margin: 10px 0; padding: 10px 15px; font-size: 14px; cursor: pointer; }
         input[type="file"] { margin-bottom: 10px; }
@@ -40,6 +40,14 @@
         <button id="search-face">Search Face</button>
         <button id="search-user">Search User</button>
         <button id="search-user-by-image">Search user by image</button>
+
+        <!-- 👇 Tâm thêm các nút mới cho nhóm 1 & nhóm 2 -->
+        <button id="detect-faces">Detect Faces</button> <!-- nhóm 1 -->
+        <button id="recognize-celebrities">Recognize Celebrities</button> <!-- nhóm 1 -->
+        <button id="detect-text">Detect Text</button> <!-- nhóm 2 -->
+        <button id="detect-moderation-labels">Detect Moderation Labels</button> <!-- nhóm 2 -->
+        <!-- 👆 Tâm thêm xong -->
+
         <h3>Kết quả</h3>
         <pre id="api-result">Chưa có kết quả</pre>
     </div>
@@ -159,6 +167,28 @@
         const result = await sendFile("/search_users_by_image");
         document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
     });
+
+    // 👇 Tâm thêm phần gọi các API mới
+    document.getElementById("detect-faces").addEventListener("click", async () => {
+        const result = await sendFile("/detect-faces");
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+
+    document.getElementById("recognize-celebrities").addEventListener("click", async () => {
+        const result = await sendFile("/recognize-celebrities");
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+
+    document.getElementById("detect-text").addEventListener("click", async () => {
+        const result = await sendFile("/detect-text");
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+
+    document.getElementById("detect-moderation-labels").addEventListener("click", async () => {
+        const result = await sendFile("/detect-moderation-labels");
+        document.getElementById("api-result").textContent = JSON.stringify(result, null, 2);
+    });
+    // 👆 Kết thúc phần Tâm thêm
 
     // ==== Cột 3 ====
     let selectedUploadFile = null;

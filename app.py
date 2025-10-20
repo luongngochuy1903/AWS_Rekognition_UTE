@@ -13,6 +13,12 @@ from modules.compare_image import compare_faces
 from modules.video.label_detect_vid import *
 from modules.video.face_detect_vid import *
 
+from modules.detect_faces import detect_faces
+from modules.detect_text import detect_text
+from modules.detect_moderation_labels import detect_moderation_labels
+from modules.recognize_celebrities import recognize_celebrities
+
+
 load_dotenv("aws-credentials.env")
 
 AWS_REGION = os.getenv("AWS_REGION")
@@ -41,6 +47,23 @@ def index():
 @app.route('/detect', methods=['POST'])
 def detect():
     return detect_labels(rekognition)
+
+@app.route('/detect-text', methods=['POST'])
+def detectText():
+    return detect_text(rekognition)
+
+@app.route('/detect-moderation-labels', methods=['POST'])
+def detectModerationLabels():
+    return detect_moderation_labels(rekognition)
+
+#tâm
+@app.route('/detect-faces', methods=['POST'])
+def detectFaces():
+    return detect_faces(rekognition)
+
+@app.route('/recognize-celebrities', methods=['POST'])
+def recognizeCelebrities():
+    return recognize_celebrities(rekognition)
 
 #VIDEO
 @app.route('/video')
